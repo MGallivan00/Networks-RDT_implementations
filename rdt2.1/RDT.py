@@ -14,9 +14,10 @@ class Packet:
     ## length of md5 checksum in hex
     checksum_length = 32
 
-    def __init__(self, seq_num, msg_S):
+    def __init__(self, seq_num, msg_S, ack):
         self.seq_num = seq_num
         self.msg_S = msg_S
+        self.ack = ack
 
     @classmethod # fix this. Error detection!
     def from_byte_S(self, byte_S):
@@ -25,7 +26,7 @@ class Packet:
             msg_S = byte_S[Packet.length_S_length+Packet.seq_num_S_length+Packet.checksum_length :]
             return self(seq_num, msg_S, True)
         else:
-            return self(False)
+            return self(seq_num, msg_S, False)
 
     def get_byte_S(self):
         # Changes the length of the sequence number by adding 0 to the left until its seq_num_S_length
@@ -68,24 +69,24 @@ class RDT:
 
     def sendNACK(self):
         if(self.seq_num == 0):
-            self.network.udt_send("10".encode()) # sequence number 0 and NACK
+            self.network.udt_send("10") # sequence number 0 and NACK
         else:
-            self.network.udt_send("11".encode()) # sequence number 1 and NACK
+            self.network.udt_send("11") # sequence number 1 and NACK
 
     def sendACK(self):
         if(self.seq_num == 0):
-            self.network.udt_send("00".encode()) # sequence number 0 and ACK
+            self.network.udt_send("00") # sequence number 0 and ACK
         else:
-            self.network.udt_send("01".encode()) # sequence number 1 and ACK
+            self.network.udt_send("01") # sequence number 1 and ACK
 
 
     def rdt_1_0_send(self, msg_S):
-        p = Packet(self.seq_num, msg_S)
+        p = Packet(self.seq_num, msg_S, None)
         self.seq_num += 1
         self.network.udt_send(p.get_byte_S())
 
     def rdt_2_1_send(self, msg_S): # copied from rdt 1.0
-        p = Packet(self.seq_num, msg_S)
+        p = Packet(self.seq_num, msg_S, None)
         self.seq_num += 1
         self.network.udt_send(p.get_byte_S())
 
@@ -106,12 +107,12 @@ class RDT:
 
             p = Packet.from_byte_S(self.byte_buffer[0:length])
             if(not p):
-                sendNACK()
+                self.sendNACK()
                 receive = None
                 while True:
                     print("Hello")
 
-            sendACK()
+            self.sendACK()
 
 
             ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
