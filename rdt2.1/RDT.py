@@ -93,40 +93,38 @@ class RDT:
         self.network.udt_send(p.get_byte_S())#send the packet
 
         byte_S=self.network.udt_receive()#receive the ack or nack
-        acknack=byte_S.decode("utf_8")
-         #check the ack or nack
-        if (self.seq_num == 0 ){
-            if(acknack == "00"){
-                print("Received right ack")
-            }elif(acknack == "01"){
-                print("Received wrong ack")
-            }elif(acknack == "10"){
-                print("Received right nack")
-            }elif(acknack == "11"){
-                print("Received wrong nack")
-            }
+        acknack=byte_S
+        if self.seq_num == 0:#check the ack or nack
+            if acknack == "00":
+                print("Received right ack\n")
+            elif acknack == "01":
+                print("Received wrong ack\n")
+            elif acknack == "10":
+                print("Received right nack\n")
+            elif acknack == "11" :
+                print("Received wrong nack\n")
 
-        }elif(self.seq_num == 1){
-            if(acknack == "00"){
-                print("Received wrong ack")
-            }elif(acknack == "01"){
-                print("Received right ack")
-            }elif(acknack == "10"){
-                print("Received wrong nack")
-            }elif(acknack == "11"){
-                print("Received right nack")
-            }
-        }else{
+
+
+        elif self.seq_num == 1:
+            if acknack == "00":
+                print("Received wrong ack\n")
+            elif acknack == "01":
+                print("Received right ack\n")
+            elif acknack == "10":
+                print("Received wrong nack\n")
+            elif acknack == "11":
+                print("Received right nack\n")
+
+        else:
             print("error\n")
-        }
         #alternate sequence number
-        if (self.seq_num == 0){
+        if self.seq_num == 0 :
             self.seq_num =1
-        }elif(self.seq_num == 1){
+        elif self.seq_num == 1 :
             self.seq_num =0
-        }else{
+        else:
             print("error\n")
-        }
 
     def rdt_2_1_receive(self):  # copied, will get back to later
         ret_S = None
