@@ -26,7 +26,7 @@ class Packet:
             msg_S = byte_S[Packet.length_S_length+Packet.seq_num_S_length+Packet.checksum_length :]
             return self(seq_num, msg_S, True)
         else:
-            return self(seq_num, msg_S, False)
+            return False
 
     def get_byte_S(self):
         # Changes the length of the sequence number by adding 0 to the left until its seq_num_S_length
@@ -85,10 +85,48 @@ class RDT:
         self.seq_num += 1
         self.network.udt_send(p.get_byte_S())
 
+
+
     def rdt_2_1_send(self, msg_S): # copied from rdt 1.0
         p = Packet(self.seq_num, msg_S, None)
-        self.seq_num += 1
-        self.network.udt_send(p.get_byte_S())
+
+        self.network.udt_send(p.get_byte_S())#send the packet
+
+        byte_S=self.network.udt_receive()#receive the ack or nack
+        acknack=byte_S.decode("utf_8")
+         #check the ack or nack
+        if (self.seq_num == 0 ){
+            if(acknack == "00"){
+                print("Received right ack")
+            }elif(acknack == "01"){
+                print("Received wrong ack")
+            }elif(acknack == "10"){
+                print("Received right nack")
+            }elif(acknack == "11"){
+                print("Received wrong nack")
+            }
+
+        }elif(self.seq_num == 1){
+            if(acknack == "00"){
+                print("Received wrong ack")
+            }elif(acknack == "01"){
+                print("Received right ack")
+            }elif(acknack == "10"){
+                print("Received wrong nack")
+            }elif(acknack == "11"){
+                print("Received right nack")
+            }
+        }else{
+            print("error\n")
+        }
+        #alternate sequence number
+        if (self.seq_num == 0){
+            self.seq_num =1
+        }elif(self.seq_num == 1){
+            self.seq_num =0
+        }else{
+            print("error\n")
+        }
 
     def rdt_2_1_receive(self):  # copied, will get back to later
         ret_S = None
