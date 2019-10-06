@@ -89,9 +89,7 @@ class RDT:
 
     def rdt_2_1_send(self, msg_S): # copied from rdt 1.0
         p = Packet(self.seq_num, msg_S, None)
-
         self.network.udt_send(p.get_byte_S())#send the packet
-
         byte_S=self.network.udt_receive()#receive the ack or nack
         acknack=byte_S
         if self.seq_num == 0:#check the ack or nack
@@ -103,9 +101,8 @@ class RDT:
                 print("Received right nack\n")
             elif acknack == "11" :
                 print("Received wrong nack\n")
-
-
-
+            else:
+                print("error\n")
         elif self.seq_num == 1:
             if acknack == "00":
                 print("Received wrong ack\n")
@@ -115,6 +112,8 @@ class RDT:
                 print("Received wrong nack\n")
             elif acknack == "11":
                 print("Received right nack\n")
+            else:
+                print("error\n")
 
         else:
             print("error\n")
