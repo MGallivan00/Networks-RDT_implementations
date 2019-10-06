@@ -91,7 +91,8 @@ class RDT:
         p = Packet(self.seq_num, msg_S, None)
         self.network.udt_send(p.get_byte_S())#send the packet
         byte_S=self.network.udt_receive()#receive the ack or nack
-        acknack=byte_S
+        print("ACK NACK : "+byte_S)
+        acknack = byte_S
         if self.seq_num == 0:#check the ack or nack
             if acknack == "00":
                 print("Received right ack\n")
