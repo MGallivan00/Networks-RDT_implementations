@@ -12,6 +12,15 @@ if __name__ == '__main__':
             'C makes it easy to shoot yourself in the foot; C++ makes it harder, but when you do, it blows away your whole leg. -- Bjarne Stroustrup',
             'A mathematician is a device for turning coffee into theorems. -- Paul Erdos',
             'Grove giveth and Gates taketh away. -- Bob Metcalfe (inventor of Ethernet) on the trend of hardware speedups not being able to keep up with software demands',
+            'Wise men make proverbs, but fools repeat them. -- Samuel Palmer (1805-80)', # 1
+            'Wise men make proverbs, but fools repeat them. -- Samuel Palmer (1805-80)', # 2
+            'Wise men make proverbs, but fools repeat them. -- Samuel Palmer (1805-80)', # 3
+            'Wise men make proverbs, but fools repeat them. -- Samuel Palmer (1805-80)',# 4
+            'Wise men make proverbs, but fools repeat them. -- Samuel Palmer (1805-80)',#5
+            'Wise men make proverbs, but fools repeat them. -- Samuel Palmer (1805-80)',#6
+            'Wise men make proverbs, but fools repeat them. -- Samuel Palmer (1805-80)',#7
+            'Wise men make proverbs, but fools repeat them. -- Samuel Palmer (1805-80)',#8
+            'Wise men make proverbs, but fools repeat them. -- Samuel Palmer (1805-80)',
             'Wise men make proverbs, but fools repeat them. -- Samuel Palmer (1805-80)']
 
 

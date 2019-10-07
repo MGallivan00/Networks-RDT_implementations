@@ -24,9 +24,9 @@ class Packet:
         if not Packet.corrupt(byte_S):
             seq_num = int(byte_S[Packet.length_S_length : Packet.length_S_length+Packet.seq_num_S_length])
             msg_S = byte_S[Packet.length_S_length+Packet.seq_num_S_length+Packet.checksum_length :]
-            return self(seq_num, msg_S, True)
+            return self(seq_num, msg_S, False)
         else:
-            return False
+            return self(None, None, True)
 
     def get_byte_S(self):
         # Changes the length of the sequence number by adding 0 to the left until its seq_num_S_length
@@ -69,15 +69,15 @@ class RDT:
 
     def sendNACK(self):
         if(self.seq_num == 0):
-            self.network.udt_send("10") # sequence number 0 and NACK
+            self.network.udt_send("10".zfill(16)) # sequence number 0 and NACK
         else:
-            self.network.udt_send("11") # sequence number 1 and NACK
+            self.network.udt_send("11".zfill(16)) # sequence number 1 and NACK
 
     def sendACK(self):
         if(self.seq_num == 0):
-            self.network.udt_send("00") # sequence number 0 and ACK
+            self.network.udt_send("00".zfill(16)) # sequence number 0 and ACK
         else:
-            self.network.udt_send("01") # sequence number 1 and ACK
+            self.network.udt_send("01".zfill(16)) # sequence number 1 and ACK
 
 
     def rdt_1_0_send(self, msg_S):
@@ -90,34 +90,38 @@ class RDT:
     def rdt_2_1_send(self, msg_S): # copied from rdt 1.0
         p = Packet(self.seq_num, msg_S, None)
         self.network.udt_send(p.get_byte_S())#send the packet
+
         byte_S=self.network.udt_receive()#receive the ack or nack
-        print("ACK NACK : "+byte_S)
+
+        print("ACK NACK : "+byte_S+ "\n\n")
         acknack = byte_S
         if self.seq_num == 0:#check the ack or nack
-            if acknack == "00":
-                print("Received right ack\n")
-            elif acknack == "01":
-                print("Received wrong ack\n")
-            elif acknack == "10":
-                print("Received right nack\n")
-            elif acknack == "11" :
-                print("Received wrong nack\n")
-            else:
-                print("error\n")
+            while acknack != "00".zfill(16):
+                print("corrupt: not 00. receive ACK/NACK")
+                self.network.udt_send(p.get_byte_S())
+                while byte_S != " ":
+                    print("b:", byte_S + "5")
+                    byte_S=self.network.udt_receive()
+                acknack = byte_S
+                print("Acknack: ", acknack)
+            print("Received right ack\n")
+
+
         elif self.seq_num == 1:
-            if acknack == "00":
-                print("Received wrong ack\n")
-            elif acknack == "01":
-                print("Received right ack\n")
-            elif acknack == "10":
-                print("Received wrong nack\n")
-            elif acknack == "11":
-                print("Received right nack\n")
-            else:
-                print("error\n")
+            while acknack != "10".zfill(16):
+                print("corrupt: not 10. receive ACK/NACK")
+                self.network.udt_send(p.get_byte_S())
+                print("byte_S: ", byte_S)
+                while byte_S != " ":
+                    print("b:", byte_S + "5")
+                    byte_S=self.network.udt_receive()
+                acknack = byte_S
+                print("Acknack: ", acknack)
+            print("Received right ack\n")
 
         else:
             print("error\n")
+
         #alternate sequence number
         if self.seq_num == 0 :
             self.seq_num =1
@@ -125,6 +129,8 @@ class RDT:
             self.seq_num =0
         else:
             print("error\n")
+
+
 
     def rdt_2_1_receive(self):  # copied, will get back to later
         ret_S = None
@@ -142,13 +148,30 @@ class RDT:
             #create packet from buffer content and add to return string
 
             p = Packet.from_byte_S(self.byte_buffer[0:length])
-            if(not p):
-                self.sendNACK()
-                receive = None
-                while True:
-                    print("Hello")
 
-            self.sendACK()
+            while p.ack: # while packet is corrupt...
+                self.sendNACK() # keep sending NACKs
+                byte_S = self.network.udt_receive()
+                self.byte_buffer += byte_S
+                length = int(self.byte_buffer[:Packet.length_S_length])
+                p = Packet.from_byte_S(self.byte_buffer[0:length])
+                sleep(0.5)
+                receive = None
+                print("Hello")
+
+
+
+
+
+            # if(p.ack):
+            #     self.sendNACK()
+            #     sleep(0.5)
+            #     while(not p.ack)
+            #     receive = None
+            #     print("Hello")
+
+            self.sendACK()  # we received the packet uncorrupted. We will send the ACK.
+            sleep(0.5)
 
 
             ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
