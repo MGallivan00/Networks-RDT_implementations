@@ -148,12 +148,12 @@ class RDT:
                 return ret_S #not enough bytes to read the whole packet
             #create packet from buffer content and add to return string
 
-            #corrupt packet check            
+            #corrupt packet check
             if(Packet.corrupt(self.byte_buffer[0:length])):
                 self.sendNACK()
             else:        #sequence number check
                 p = Packet.from_byte_S(self.byte_buffer[0:length])
-                if(p.seq_num == self.seq_num)
+                if(p.seq_num == self.seq_num):
                     ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
                     self.seq_num += 1
                     self.sendACK()
